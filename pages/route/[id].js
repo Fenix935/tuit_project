@@ -35,6 +35,8 @@ const DetailProduct = (props) => {
         return url
     }, [])
 
+    const levelText = ['легкий, опыт не обязателен', 'опыт не обязателен, средняя сложность', 'средняя сложность, участникам с опытом']
+
     return(
         <div className="row detail_page">
             <div className="col-md-12">
@@ -63,7 +65,7 @@ const DetailProduct = (props) => {
                                 <div className="level_wrapper" style={{marginLeft: '15px'}}>
                                     {
                                         product?.level && (
-                                            new Array(5).fill(false)
+                                            new Array(3).fill(false)
                                                 .map((item, index) => (index + 1) <= product?.level)
                                                 .map(item => (
                                                     <div className={`level_item ${item ? 'active' : ''}`}/>
@@ -73,7 +75,7 @@ const DetailProduct = (props) => {
                                 </div>
                             </div>
                             <div className="value">
-                                легкий, опыт не обязателен
+                                {levelText[product?.level - 1]}
                             </div>
                             <p className="title">Длительность:</p>
                             <div className="value">

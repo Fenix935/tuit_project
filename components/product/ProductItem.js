@@ -62,7 +62,7 @@ const ProductItem = ({product, handleCheck}) => {
                         <div className="level_wrapper">
                             {
                                 product?.level && (
-                                    new Array(5).fill(false)
+                                    new Array(3).fill(false)
                                         .map((item, index) => (index + 1) <= product?.level)
                                         .map(item => (
                                             <div className={`level_item ${item ? 'active' : ''}`}/>
