@@ -4,9 +4,11 @@ import { getData } from '../../utils/fetchData'
 import { DataContext } from '../../store/GlobalState'
 import { addToCart } from '../../store/Actions'
 import Link from "next/link";
+import connectDB from "../../utils/connectDB";
+import Routes from '../../models/routesModel'
 
 const DetailProduct = (props) => {
-    const [product] = useState(props.product)
+    const [product] = useState(JSON.parse(props.product));
     const [tab, setTab] = useState(0)
 
     const { state, dispatch } = useContext(DataContext)
@@ -158,13 +160,24 @@ const DetailProduct = (props) => {
     )
 }
 
-export async function getServerSideProps({params: {id}}) {
-    console.log(id)
-    const res = await getData(`routes/${id}`)
-    // server side rendering
-    console.log(res, 'RES')
+export async function getStaticPaths() {
+
+    // const res = await getData(`routes`);
+    connectDB();
+    const routes = await Routes.find();
+    const paths = routes.map(item => '/route/' + (item?._id || ''));
     return {
-        props: { product: res.routes }, // will be passed to the page component as props
+        paths,
+        fallback: false,
+    }
+}
+
+export async function getStaticProps ({params: {id}}) {
+    console.log(id, 'param');
+    connectDB();
+    const routes = await Routes.findById(id);
+    return {
+        props: { product: JSON.stringify(routes) }, // will be passed to the page component as props
     }
 }
 

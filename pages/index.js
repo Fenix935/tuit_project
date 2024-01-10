@@ -8,10 +8,11 @@ import filterSearch from '../utils/filterSearch'
 import {useRouter} from 'next/router'
 import Filter from '../components/Filter'
 import Link from "next/link";
+import connectDB from "../utils/connectDB";
+import Routes from "../models/routesModel";
 
 const Home = (props) => {
-    console.log(props, 'props')
-    const [products, setProducts] = useState(props.products)
+    const [products, setProducts] = useState(JSON.parse(props.products))
 
     const [isCheck, setIsCheck] = useState(false)
     const [page, setPage] = useState(1)
@@ -21,7 +22,7 @@ const Home = (props) => {
     const {auth} = state
 
     useEffect(() => {
-        setProducts(props.products)
+        setProducts(JSON.parse(props.products))
     }, [props.products])
 
     useEffect(() => {
@@ -33,28 +34,6 @@ const Home = (props) => {
             if (product._id === id) product.checked = !product.checked
         })
         setProducts([...products])
-    }
-
-    const handleCheckALL = () => {
-        products.forEach(product => product.checked = !isCheck)
-        setProducts([...products])
-        setIsCheck(!isCheck)
-    }
-
-    const handleDeleteAll = () => {
-        let deleteArr = [];
-        products.forEach(product => {
-            if (product.checked) {
-                deleteArr.push({
-                    data: '',
-                    id: product._id,
-                    title: 'Delete all selected products?',
-                    type: 'DELETE_PRODUCT'
-                })
-            }
-        })
-
-        dispatch({type: 'ADD_MODAL', payload: deleteArr})
     }
 
     const handleLoadmore = () => {
@@ -127,25 +106,11 @@ const Home = (props) => {
 }
 
 
-export async function getServerSideProps({query}) {
-    const page = query.page || 1
-    const category = query.category || 'all'
-    const sort = query.sort || ''
-    const search = query.search || 'all'
-
-    // const res = await getData(
-    //   `product?limit=${page * 6}&category=${category}&sort=${sort}&title=${search}`
-    // )
-    const res = await getData(
-        `routes`
-    )
-    console.log(res, 'res')
-    // server side rendering
+export async function getStaticProps () {
+    connectDB();
+    const routes = await Routes.find();
     return {
-        props: {
-            products: res.routes,
-            result: 1
-        }, // will be passed to the page component as props
+        props: { products: JSON.stringify(routes) }, // will be passed to the page component as props
     }
 }
 
